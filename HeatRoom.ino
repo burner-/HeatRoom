@@ -228,7 +228,7 @@ void setup()
 {
   DBG_OUTPUT_PORT.begin(115200);
   ReadConfig();
-  IPAddress ip(10, 220, 2, 6);
+  IPAddress ip(10, 220, 2, 7);
   IPAddress myDns(8,8,8, 8);
   IPAddress gateway(10, 220, 0, 1);
   IPAddress subnet(255, 255, 0, 0);
