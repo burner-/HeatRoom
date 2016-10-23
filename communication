@@ -1,5 +1,5 @@
 
-í
+á
 communication.proto"Ð
 CompressorSettings
 compressorId (
@@ -15,7 +15,17 @@
  (
 hotWaterSensorAddr (
 coolingStartSensorAddr (
-coolingStopSensorAddr (",
+coolingStopSensorAddr ("ñ
+CompressorInfo
+compressorId (
+state_water_heating (
+state_room_heating (
+state_cooling (
+compressorRun (
+panicColdStopActive (
+panicHotStopActive (
+maintainceStop (
+	pidOutput	 (",
 TempInfo
 
 SensorAddr (
