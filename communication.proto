@@ -17,6 +17,19 @@ message CompressorSettings
 	optional bytes coolingStopSensorAddr = 13; //Sensor address for cooling stop
 }
 
+message CompressorInfo
+{
+	required int32 compressorId = 1;
+	required bool state_water_heating = 2; // hot water heating
+	required bool state_room_heating = 3; //room radioators need more heat
+	required bool state_cooling = 4; // cool network need more coolness
+	required bool compressorRun = 5; // compressor running
+	required bool panicColdStopActive = 6;
+	required bool panicHotStopActive = 7;
+	required bool maintainceStop = 8;
+	optional float pidOutput = 9; // hot water servo position
+}
+
 message TempInfo
 {
 	optional bytes SensorAddr = 1;

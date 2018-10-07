@@ -10,6 +10,8 @@
 #define ONEWIRE_PIN3 CONTROLLINO_D11
 
 #define COMPRESSOR_PIN CONTROLLINO_R0
+#define COMPRESSOR2_PIN CONTROLLINO_R2
+
 #define GROUNDPUMP_PIN CONTROLLINO_R5
 #define GROUNDTANK_PIN CONTROLLINO_D8
 #define PIN_SHUNT_OFFICE CONTROLLINO_D0
@@ -22,6 +24,7 @@ IPAddress bcast(255, 255, 255, 255); // Multicast address
 double temp_main = READ_ERROR_VALUE;           //last temperature
 double temp_backup = READ_ERROR_VALUE;           //last temperature
 boolean compressorPowerOn = false;
+boolean compressor2PowerOn = true;
 boolean groundPumpPowerOn = false;
 boolean groundTankOn = false;
 
@@ -64,6 +67,8 @@ public:
   PID Controller = PID(&pidInput, &pidOutput, &pidSettings.pidSetpoint, 0, 0, 0, DIRECT);
 };
 
+CompressorInfo Compressors[2] = {};
+
 LinkedList<PidController*> Pids = LinkedList<PidController*>();
 
 void loadPid(int id,int pin){
@@ -87,6 +92,7 @@ typedef enum packetType {
   TYPE_1WIRE = 0x10,
   TYPE_PID_INFO = 0x11,
   TYPE_PB_TEMP_INFO = 0x20,
+  TYPE_PB_COMPRESSOR_INFO = 0x21,
   // server to node
   TYPE_PID_SET_ADDRESS = 0xF0,
   TYPE_PID_SET_SETPOINT = 0xF1,
@@ -201,6 +207,33 @@ void netRecvProtoBuffTempInfo(byte packetBuffer[], int packetSize )
     }
   }
 }
+void   netRecvCompressorInfo(byte packetBuffer[], int packetSize )
+{
+  CompressorInfo message;
+  pb_istream_t stream = pb_istream_from_buffer(packetBuffer, packetSize);
+  bool status = pb_decode(&stream, TempInfo_fields, &message);
+  if (!status)
+  {
+    DBG_OUTPUT_PORT.print(F("PB Message decoding failed: "));
+    DBG_OUTPUT_PORT.println(PB_GET_ERROR(&stream));
+  } 
+  else
+  {
+    if (message.compressorId == 2)
+    {
+      int idx = message.compressorId -1;
+      Compressors[idx].state_water_heating = message.state_water_heating;
+      Compressors[idx].state_cooling = message.state_cooling; 
+      Compressors[idx].compressorRun = message.compressorRun; 
+      Compressors[idx].panicColdStopActive = message.panicColdStopActive; 
+      Compressors[idx].panicHotStopActive = message.panicHotStopActive; 
+      Compressors[idx].maintainceStop = message.maintainceStop; 
+      Compressors[idx].has_pidOutput = message.has_pidOutput; 
+      Compressors[idx].pidOutput = message.pidOutput; 
+    }
+  }
+}
+
 
 void copyByteArrayToCharArray(byte in[], char out[],int len){
   for(int i=0;i<len;i++){
@@ -271,7 +304,13 @@ bool readPbNetwork()
     if (messagetype == TYPE_SET_COMPRESSOR_SETTINGS)
     {
       //netRecvCompressorSettings(packetBuffer, (packetSize -1));
+    }
+     
+    else if (messagetype == TYPE_PB_COMPRESSOR_INFO)
+    {
+      netRecvCompressorInfo(packetBuffer, (packetSize -1));
     } 
+
     else if (messagetype == TYPE_PB_TEMP_INFO)
     {
       DBG_OUTPUT_PORT.print("Temp from ");
@@ -584,6 +623,8 @@ void doFullTempSensorRead()
 void initScada()
 {
   pinMode(COMPRESSOR_PIN, OUTPUT); 
+  pinMode(COMPRESSOR2_PIN, OUTPUT); 
+
   pinMode(GROUNDPUMP_PIN, OUTPUT); 
   pinMode(GROUNDTANK_PIN, OUTPUT); 
 
@@ -641,6 +682,12 @@ void handleScada()
     digitalWrite(COMPRESSOR_PIN, HIGH);
   else 
     digitalWrite(COMPRESSOR_PIN, LOW);
+
+  if (compressor2PowerOn)
+    digitalWrite(COMPRESSOR2_PIN, HIGH);
+  else 
+    digitalWrite(COMPRESSOR2_PIN, LOW);
+
 
   if (groundPumpPowerOn)
     digitalWrite(GROUNDPUMP_PIN, HIGH);

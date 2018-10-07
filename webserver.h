@@ -317,6 +317,7 @@ void set_settings()
   jsonAddValue(values, "temp_backup_sensor", sensorAddr, false);
   
   values += "\n}";
+  server.sendHeader("Access-Control-Allow-Origin", ORIGIN);
   server.send ( 200, "text/plain", values);
     
 }
