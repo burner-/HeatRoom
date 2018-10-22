@@ -1,6 +1,8 @@
-//#include <SD.h>
 
-#include <StandardCplusplus.h>
+//#include <SD.h>
+#define HOSTNAME "tt29controller"
+
+#include <ArduinoSTL.h>
 #include <Controllino.h>
 
 #define DBG_OUTPUT_PORT Serial
@@ -13,15 +15,16 @@
 #define DEBUG_MSG(...)
 #endif
 
-//#include <Dns.h>
+//   #include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
 #include <EthernetUdp.h>
 #include <EthernetWebServer.h>
+#include <ModbusIP.h>
+#include <PID_v1.h>
 #include <avr/wdt.h>
-#include "H801WiFi.h"
-//#include "syslog.h"
+#include "syslog.h"
 #include <LinkedList.h>
 #include <EEPROM.h>
 #include <ArduinoJson.h>
@@ -34,6 +37,9 @@
 #include <pb.h>
 #include "communication.h"
 #include "scada.h"
+
+#include "compressor.h"
+
 #include "webserver.h"
 
 boolean AdminEnabled = true;    // Enable Admin Mode for a given Time
@@ -41,6 +47,8 @@ boolean AdminEnabled = true;    // Enable Admin Mode for a given Time
 // sensor book keeping
 bool allFound = false;
 int sensorCount = 0;
+
+
 
 
 void handle_gauge()
@@ -88,7 +96,7 @@ void handle_sensors()
   while (exceptedSize > sentSize) {
     retbuf += "\n";
     sentSize++;
-    if (retbuf.lenght > 50)
+    if (retbuf.length() > 50)
     {
       server.sendContent(retbuf);
       retbuf = "";
@@ -275,7 +283,7 @@ void setup()
   IPAddress myDns(8, 8, 8, 8);
   IPAddress gateway(10, 220, 0, 1);
   IPAddress subnet(255, 255, 0, 0);
-  Ethernet.begin(mac, ip, myDns, gateway, subnet);
+  modbus.config(mac, ip, myDns, gateway, subnet);
 
   Serial.println(F("Starting..."));
   Serial.println(Ethernet.localIP());
@@ -294,7 +302,8 @@ void loop() {
   yield();
   server.handleClient();
   yield();
+  modbus.task();
+  yield();
   //handleWebClients();
   handleScada();
 }
-

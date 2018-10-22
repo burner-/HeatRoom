@@ -1,7 +1,6 @@
-#include <PID_v1.h>
 
 #include <OneWire.h>
-
+#include <ArduinoJson.h>
 
 #define pbufUDP_PORT 8889
 #define jsonUDP_PORT 8890
@@ -20,10 +19,22 @@
 
 IPAddress mcast(239, 0, 0, 20); // Multicast address
 IPAddress bcast(255, 255, 255, 255); // Multicast address
+ModbusIP modbus;
 
-double temp_main = READ_ERROR_VALUE;           //last temperature
-double temp_backup = READ_ERROR_VALUE;           //last temperature
-boolean compressorPowerOn = false;
+float temp_main = READ_ERROR_VALUE;           //last temperature
+float temp_backup = READ_ERROR_VALUE;           //last temperature
+
+// current temperatures
+float pidSensor = READ_ERROR_VALUE;; //Sensor temp for hot water pid controlling
+float hotWaterSensor = READ_ERROR_VALUE;; //Sensor temp for hot water heating request
+float coolingStartSensor = READ_ERROR_VALUE;; //Sensor temp for cooling start
+float coolingStopSensor = READ_ERROR_VALUE;; //Sensor temp for cooling stop
+float warmWaterStartSensor = READ_ERROR_VALUE;; //Sensor temp for warming start
+float warmWaterStopSensor = READ_ERROR_VALUE;; //Sensor temp for warming stop
+float compressorHotLimitSensor = READ_ERROR_VALUE;; //Sensor temp for emergency stop
+float compressorColdLimitSensor = READ_ERROR_VALUE;; //Sensor temp for emergency stop
+
+boolean compressorPowerOn = false; // user toggle for compressor
 boolean compressor2PowerOn = true;
 boolean groundPumpPowerOn = false;
 boolean groundTankOn = false;
@@ -87,7 +98,7 @@ void loadPid(int id,int pin){
 }
 
 // packet types
-typedef enum packetType { 
+enum packetType { 
   TYPE_SENDERROR = 0x5,
   TYPE_1WIRE = 0x10,
   TYPE_PID_INFO = 0x11,
@@ -126,9 +137,22 @@ void dumpType(byte type)
 
 
 LinkedList<SensorInfo*> sensors = LinkedList<SensorInfo*>();
+
+void updateTempToStatic(byte addrA[], byte addrB[], float curTemp, float *target,int modBusAddr)
+{
+  if (ByteArrayCompare(addrA, addrB, 8))
+  {
+    *target = curTemp;
+    modbus.Ireg(modBusAddr, curTemp);
+  }  
+}
+
 //Update temp to static variables and pids
 void updateTemp(byte address[8], float curTemp)
 {
+  // Update temperature sensor values
+  updateTempToStatic(config.temp_main_sensor, address,curTemp, &temp_main, 100);
+  
   if (ByteArrayCompare(config.temp_main_sensor, address, 8))
   {
     temp_main = curTemp;
@@ -136,6 +160,46 @@ void updateTemp(byte address[8], float curTemp)
   else if (ByteArrayCompare(config.temp_backup_sensor, address, 8))
   {
     temp_backup = curTemp;
+  }
+  else if (ByteArrayCompare(config.coolingStopSensorAddr, address, 8))
+  {
+    coolingStopSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.warmWaterStartSensorAddr, address, 8))
+  {
+    warmWaterStartSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.warmWaterStopSensorAddr, address, 8))
+  {
+    warmWaterStopSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.coolingStartSensorAddr, address, 8))
+  {
+    coolingStartSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.hotWaterSensorAddr, address, 8))
+  {
+    hotWaterSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.pidSensorAddr, address, 8))
+  {
+    pidSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+  else if (ByteArrayCompare(config.compressorColdLimitSensorAddr, address, 8))
+  {
+    compressorColdLimitSensor = curTemp;
+    modbus.Ireg(100, curTemp);
+  }
+    else if (ByteArrayCompare(config.compressorHotLimitSensorAddr, address, 8))
+  {
+    compressorHotLimitSensor = curTemp;
+    modbus.Ireg(100, curTemp);
   }
 
   for (int i = 0; i < Pids.size(); i++)
@@ -707,5 +771,3 @@ void handleScada()
     analogWrite(pid->Pin, pid->pidOutput);
   }
 }
-
-

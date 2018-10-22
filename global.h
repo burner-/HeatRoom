@@ -89,21 +89,22 @@ String urldecode(String input) // (based on https://code.google.com/p/avr-netino
   
 }
 
-template <class T> int EEPROM_writeGeneric(int ee, const T& value)
+
+template <class T> int EEPROM_writeGeneric(int offset, const T& value)
 {
   const byte* p = (const byte*)(const void*)&value;
   unsigned int i;
   for (i = 0; i < sizeof(value); i++)
-    EEPROM.update(ee++, *p++);
+    EEPROM.update(offset++, *p++);
   return i;
 }
 
-template <class T> int EEPROM_readGeneric(int ee, T& value)
+template <class T> int EEPROM_readGeneric(int offset, T& value)
 {
   byte* p = (byte*)(void*)&value;
   unsigned int i;
   for (i = 0; i < sizeof(value); i++)
-    *p++ = EEPROM.read(ee++);
+    *p++ = EEPROM.read(offset++);
   return i;
 }
 
@@ -190,4 +191,14 @@ void getAddressBytes(String string, byte retBytes[])
   }
   DBG_OUTPUT_PORT.println("");
   return;
+}
+
+bool matchArray(byte arrayA[], byte arrayB[],int from, int to)
+{
+  for(byte i=from;i<=to;i++)
+  {
+    if (arrayB[i] != arrayA[i])
+      return false;
+  }
+  return true;
 }
