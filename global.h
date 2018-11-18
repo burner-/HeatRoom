@@ -1,4 +1,4 @@
-EthernetWebServer server ( 80 );
+//EthernetWebServer server ( 80 );
 
 //
 // Check the Values is between 0-255
@@ -65,29 +65,7 @@ unsigned char h2int(char c)
     }
     return(0);
 }
-String urldecode(String input) // (based on https://code.google.com/p/avr-netino/)
-{
-   char c;
-   String ret = "";
-   
-   for(byte t=0;t<input.length();t++)
-   {
-     c = input[t];
-     if (c == '+') c = ' ';
-         if (c == '%') {
 
-
-         t++;
-         c = input[t];
-         t++;
-         c = (h2int(c) << 4) | h2int(input[t]);
-     }
-    
-     ret.concat(c);
-   }
-   return ret;
-  
-}
 
 
 template <class T> int EEPROM_writeGeneric(int offset, const T& value)
