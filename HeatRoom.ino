@@ -1,4 +1,4 @@
-#define HOSTNAME "tt29controller"
+#define HOSTNAME "tt29controller1"
 #include <Controllino.h>
 #define DBG_OUTPUT_PORT Serial
 #include <Ethernet.h>
@@ -10,11 +10,12 @@
 #include <LinkedList.h>
 #include <EEPROM.h>
 
-
+/*
 #include <pb_encode.h>
 #include <pb_decode.h>
 #include <pb.h>
 #include "communication.h"
+*/
 
 #include "global.h"
 #include "config.h"
@@ -28,13 +29,13 @@
 
 
 
-byte mac[] = {0xDE, 0xAD, 0xBE, 0x5F, 0x5A, 0x4D};
+byte mac[] = {0xDE, 0xAD, 0xBE, 0x5F, 0x5B, 0x1E};
 
 void setup()
 {
   DBG_OUTPUT_PORT.begin(115200);
 //  ReadConfig();
-  IPAddress ip(10, 220, 2, 9);
+  IPAddress ip(10, 220, 2, 7);
   IPAddress myDns(8, 8, 8, 8);
   IPAddress gateway(10, 220, 0, 1);
   IPAddress subnet(255, 255, 0, 0);

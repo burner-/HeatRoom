@@ -7,7 +7,7 @@
 #define ONEWIRE_PIN2 CONTROLLINO_D10
 #define ONEWIRE_PIN3 CONTROLLINO_D11
 
-#define COMPRESSOR2_PIN CONTROLLINO_R2
+//#define COMPRESSOR2_PIN CONTROLLINO_R2
 
 #define GROUNDPUMP_PIN CONTROLLINO_R5
 #define GROUNDTANK_PIN CONTROLLINO_D8
@@ -108,9 +108,9 @@ void updateSensorInfo(OneWire *ds, byte address[8], float curTemp, boolean local
 {
   //update temp to static values
   updateTemp(address, curTemp);
-  //hexPrintArray(address,8);
-  //DBG_OUTPUT_PORT.print("\t");
-  //DBG_OUTPUT_PORT.println(curTemp);
+  hexPrintArray(address,8);
+  DBG_OUTPUT_PORT.print("\t");
+  DBG_OUTPUT_PORT.println(curTemp);
 
   // publish generic mqtt topic
   String addrStr = "";
@@ -356,7 +356,7 @@ void initScada()
 bool startByBackup = false;
 
 unsigned long nexttempread = 0;
-
+/*
 void netRecvProtoBuffTempInfo(byte packetBuffer[], int packetSize )
 {
   TempInfo message;
@@ -404,7 +404,7 @@ bool readPbNetwork()
 
 
 }
-
+*/
 void handleScada()
 {
   
@@ -414,7 +414,7 @@ void handleScada()
     nexttempread = millis() + 5000;
   }
   
-  while (readPbNetwork()){}
+//  while (readPbNetwork()){}
 
 
   if (groundPumpPowerOn)

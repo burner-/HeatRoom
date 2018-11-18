@@ -51,3 +51,12 @@ bool setState(bool* stateVariable, bool newState) {
   }
   return true;
 }
+// publish all current states
+void publishStates()
+{
+  for (int i = 0; i < ARR_STATES; i++)
+  {
+    stateMapping mapping = StateMap[i];
+    mqtt.publish(MQTT_COMPRESSOR_STATUS_PREFIX + mapping.StateName + String("/status"), String(*mapping.State),true,0);
+  }
+}

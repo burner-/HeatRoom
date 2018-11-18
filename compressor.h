@@ -4,12 +4,12 @@
 //pin definitions
 
 #define PIN_FLOW_VALVE 1
-#define PIN_COMPRESSOR_RUN CONTROLLINO_R0
+#define PIN_COMPRESSOR_RUN CONTROLLINO_R2
 #define PIN_MODE_VALVE_SERVO 2
 #define MODBUS_COMPRESSOR_RUN 100
 
-#define COMPRESSOR_PIN_STATE_STOP HIGH
-#define COMPRESSOR_PIN_STATE_RUN LOW
+#define COMPRESSOR_PIN_STATE_STOP LOW
+#define COMPRESSOR_PIN_STATE_RUN HIGH
 
 
 // define persentage for each position
@@ -324,7 +324,7 @@ void initCompressorLogic() {
   pinMode(PIN_COMPRESSOR_RUN, OUTPUT);
   pinMode(PIN_FLOW_VALVE, OUTPUT);
   digitalWrite(PIN_FLOW_VALVE, HIGH);
-  digitalWrite(PIN_COMPRESSOR_RUN, HIGH);
+  digitalWrite(PIN_COMPRESSOR_RUN, COMPRESSOR_PIN_STATE_STOP);
   t.after(10000, CompressorUnWait); // prevent compressor start before temperature sensors are online
 
 }

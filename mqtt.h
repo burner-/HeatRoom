@@ -60,6 +60,6 @@ void initMQTT() {
   mqtt.onMessage(mqttReceived);
   connectMQTT();
   mqtt.publish(String(MQTT_START) , "requestconf");
-
+  publishStates();
 
 }
