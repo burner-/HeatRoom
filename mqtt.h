@@ -50,6 +50,9 @@ void mqttReceived(String &topic, String &payload) {
       mqtt.publish(MQTT_COMPRESSOR_STATUS_PREFIX + mapping.StateName + String("/status"), String(*mapping.State), true, 0);
     }
   }
+  else if (topic == String(MQTT_COMPRESSOR_STATUS_PREFIX) + "compressorWait/reset") {
+    CompressorUnWait();
+  }
 
 }
 

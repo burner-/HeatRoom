@@ -118,7 +118,8 @@ void StopCompressor()
   {
     t.after(10000, CloseFlowValve); // After 10 seconds close flow valve  
     setState(&compressorWait, true);
-    int wait = int(config.compressorWaitTime) * 1000;
+    unsigned long waittime = long(config.compressorWaitTime);
+    unsigned long wait = waittime * 1000UL;
     logToMQTT("compressorWaitTime", "wait " + String(wait) + "ms");
     t.after(wait, CompressorUnWait); // After 10 seconds close flow valve
   }
@@ -325,6 +326,6 @@ void initCompressorLogic() {
   pinMode(PIN_FLOW_VALVE, OUTPUT);
   digitalWrite(PIN_FLOW_VALVE, HIGH);
   digitalWrite(PIN_COMPRESSOR_RUN, COMPRESSOR_PIN_STATE_STOP);
-  t.after(10000, CompressorUnWait); // prevent compressor start before temperature sensors are online
+  t.after(20000, CompressorUnWait); // prevent compressor start before temperature sensors are online
 
 }
