@@ -9,6 +9,9 @@ bool maintainceStop = false;
 bool heating_isStarting = false;
 bool flowValve = false;
 bool compressorWait = true; // default true for preventing compressor start when temp sensors are not ready
+bool maintenanceStop = false;
+bool groundPumpPower = false;
+
 
 class stateMapping {
   public:
@@ -22,7 +25,7 @@ stateMapping::stateMapping(String stateName, bool* stateVariable) {
   State = stateVariable;
 }
 
-#define ARR_STATES 10
+#define ARR_STATES 12
 stateMapping StateMap[ARR_STATES] = {
   stateMapping("state_water_heating", &state_water_heating),
   stateMapping("state_room_heating", &state_room_heating),
@@ -33,7 +36,10 @@ stateMapping StateMap[ARR_STATES] = {
   stateMapping("maintainceStop", &maintainceStop),
   stateMapping("heating_isStarting", &heating_isStarting),
   stateMapping("flowValve", &flowValve),
-  stateMapping("compressorWait", &compressorWait)
+  stateMapping("compressorWait", &compressorWait),
+  stateMapping("maintenanceStop", &maintenanceStop),
+  stateMapping("groundPumpPower", &groundPumpPower)
+
 };
 
 bool setState(bool* stateVariable, bool newState) {

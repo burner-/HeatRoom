@@ -7,7 +7,6 @@
 #define ONEWIRE_PIN2 CONTROLLINO_D10
 #define ONEWIRE_PIN3 CONTROLLINO_D11
 
-//#define COMPRESSOR2_PIN CONTROLLINO_R2
 
 #define GROUNDPUMP_PIN CONTROLLINO_R5
 #define GROUNDTANK_PIN CONTROLLINO_D8
@@ -17,11 +16,9 @@
 IPAddress mcast(239, 0, 0, 20); // Multicast address
 IPAddress bcast(255, 255, 255, 255); // Multicast address
 
-EthernetUDP pbufUdp; // OBSOLETE
 
 boolean compressorPowerOn = false; // user toggle for compressor
 boolean compressor2PowerOn = true;
-boolean groundPumpPowerOn = false;
 boolean groundTankOn = false;
 
 
@@ -343,7 +340,6 @@ void initScada()
   pinMode(GROUNDPUMP_PIN, OUTPUT); 
   pinMode(GROUNDTANK_PIN, OUTPUT); 
 
-  pbufUdp.begin(8889);
   searchAllTempSensors(&ds1);
   searchAllTempSensors(&ds2);
   searchAllTempSensors(&ds3);
@@ -417,7 +413,7 @@ void handleScada()
 //  while (readPbNetwork()){}
 
 
-  if (groundPumpPowerOn)
+  if (groundPumpPower)
     digitalWrite(GROUNDPUMP_PIN, HIGH);
   else 
     digitalWrite(GROUNDPUMP_PIN, LOW);

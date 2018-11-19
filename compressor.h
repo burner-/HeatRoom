@@ -19,7 +19,7 @@
 // Ground sircullation mode
 #define GROUND_SINK 1
 #define GROUND_SOURCE 2
-#include "statemapping.h"
+
 
 Timer t;
 

@@ -10,16 +10,11 @@
 #include <LinkedList.h>
 #include <EEPROM.h>
 
-/*
-#include <pb_encode.h>
-#include <pb_decode.h>
-#include <pb.h>
-#include "communication.h"
-*/
 
 #include "global.h"
 #include "config.h"
 #include "sensormapping.h"
+#include "statemapping.h"
 #include "limitmapping.h"
 #include "scada.h"
 #include "compressor.h"
